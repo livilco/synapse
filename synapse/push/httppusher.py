@@ -336,6 +336,13 @@ class HttpPusher(Pusher):
         if event is None:
             return True  # It's been redacted
 
+        mx_sender_id = event.content.get("mx_sender_id")
+        logger.info("Checking for self message: mx_sender_id = %s, user_id = %s", mx_sender_id, self.user_id)
+        if mx_sender_id == self.user_id:
+            # We don't want to send push notifications for messages sent by the user
+            logger.info("Not sending push notification for self message")
+            return True
+
         # Check if we should delay sending out the notification by a random
         # amount.
         #
